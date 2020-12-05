@@ -1,4 +1,5 @@
 scraper/pages.txt
-scraper/Wikipedia-20201202212141.xml
-scraper/Wikipedia-20201202230101.xml
+indexer/Wikipedia-20201202212141.xml
+indexer/Wikipedia-20201202230101.xml
 scraper/pages_2.txt
+indexer/__pycache__/*
