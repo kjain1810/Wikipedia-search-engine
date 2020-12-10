@@ -1,0 +1,23 @@
+word collection, each doc will be of type:
+{
+    'id': ID,
+    'word': str,
+    'docs': [
+        {
+            'docID': ID,
+            'frequency': int,
+            'title': bool,
+            'infobox'; bool,
+            'category': bool,
+            'references': bool,
+            'links': bool
+        }
+    ]
+}
+
+doc collection, each doc will be of type:
+{
+    'id': ID,
+    'title': str,
+    'tokens': int
+}
