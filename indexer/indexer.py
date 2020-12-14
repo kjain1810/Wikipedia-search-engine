@@ -1,10 +1,10 @@
+import time
 import xml.sax.handler
 from nltk.corpus import stopwords
 import pymongo
 import re
 import Stemmer
-from settings import DB_NAME, WORD_COLLECTION, DOC_COLLECTION, \
-    TITLE_WEIGHT, REMOVE_STOPWORDS, STEMMING
+from settings import TITLE_WEIGHT, REMOVE_STOPWORDS, STEMMING
 from invertedindexer import InvertedIndexer
 
 
@@ -14,12 +14,6 @@ class Indexer(xml.sax.handler.ContentHandler):
         self.stop_words = stopwords.words("english")
         self.stemmer = Stemmer.Stemmer('english')
         self.invertedindexer = InvertedIndexer()
-
-        self.dbname = DB_NAME
-        self.client = pymongo.MongoClient("localhost", 27017)
-        self.db = self.client[DB_NAME]
-        self.wordCollection = self.db[WORD_COLLECTION]
-        self.documentCollection = self.db[DOC_COLLECTION]
 
         self.parser = xml.sax.make_parser()
         self.parser.setFeature(xml.sax.handler.feature_namespaces, 0)
@@ -36,18 +30,25 @@ class Indexer(xml.sax.handler.ContentHandler):
         self.external_reg = re.compile(r"==.*external links.*==")
         self.links_reg = re.compile(r"(https?://\S+)")
 
+        self.doccount = 0
+
     def parse_files(self, filepath):
         print(f"Parsing {filepath}...")
         self.parser.parse(filepath)
         print(f"{filepath} parsed!")
+
+    def endDocument(self):
+        self.invertedindexer.finishwrites()
 
     def startElement(self, name, attrs):
         self.current_tag = name
 
     def endElement(self, name):
         if name == 'page':
-            print(f"Finishing page {self.current_doc_name}")
             self.index()
+            self.doccount += 1
+            if self.doccount % 100 == 0:
+                print(self.doccount)
             self.current_doc_data = ""
             self.current_doc_name = ""
 
@@ -125,10 +126,15 @@ class Indexer(xml.sax.handler.ContentHandler):
                             links_dict[link] = 0
                         links_dict[link] += 1
 
+        self.invertedindexer.insertdocument(
+            self.current_doc_name.strip(), num_tokens)
         self.invertedindexer.index(
             word_dict, category_dict, reference_dict, links_dict)
 
 
 if __name__ == "__main__":
     indexer = Indexer()
+    print("Parsing...")
+    start_time = time.time()
     indexer.parse_files("Wikipedia-20201206200853.xml")
+    print("Completed 2 docs in: %s seconds" % (time.time() - start_time))

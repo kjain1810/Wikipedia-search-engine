@@ -7,10 +7,9 @@ word collection, each doc will be of type:
             'docID': ID,
             'frequency': int,
             'title': bool,
-            'infobox'; bool,
             'category': bool,
             'references': bool,
-            'links': bool
+            'links': int
         }
     ]
 }

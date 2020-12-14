@@ -2,7 +2,7 @@ from indexer import Indexer
 import os
 
 if __name__ == "__main__":
-    indexer = Indexer(dbname="invindexes")
+    indexer = Indexer()
     curpath = os.getcwd()
 
     for file in os.listdir(curpath):
