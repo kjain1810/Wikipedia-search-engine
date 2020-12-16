@@ -6,8 +6,10 @@
 
 void insertDocuments(std::vector<docs> &documents)
 {
-    // insert documents to db
-    std::cout << documents.size() << "\n";
+}
+
+void insertOccurences(std::vector<occurrence> &occurences)
+{
 }
 
 #endif

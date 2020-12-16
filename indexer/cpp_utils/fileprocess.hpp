@@ -35,11 +35,23 @@ int getint(std::string line, char separator, int &idx, int len)
     return ret;
 }
 
+bool getbool(std::string line, char separator, int &idx, int len)
+{
+    bool ret;
+    if (line[idx] == 'F')
+        ret = false;
+    else
+        ret = true;
+    while (idx < len && line[idx] != ',')
+        idx++;
+    idx++;
+    return ret;
+}
+
 void processDocFile(std::string filePath)
 {
     std::ifstream docFile(filePath);
     std::string line;
-    int cnt = 1;
     std::vector<docs> documents;
     while (std::getline(docFile, line))
     {
@@ -47,11 +59,10 @@ void processDocFile(std::string filePath)
         std::string title = "";
         int len = line.length();
         int idx = 0;
-        docID = getint(line, ',', idx, len);
-        title = getstring(line, ',', idx, len);
-        tokens = getint(line, ',', idx, len);
+        docID = getint(line, SEPARATOR, idx, len);
+        title = getstring(line, SEPARATOR, idx, len);
+        tokens = getint(line, SEPARATOR, idx, len);
         documents.push_back(docs(docID, title, tokens));
-        cnt++;
         if (documents.size() >= MAX_INSERT_LIMIT)
         {
             insertDocuments(documents);
@@ -63,6 +74,31 @@ void processDocFile(std::string filePath)
 
 void processWordFile(std::string filePath)
 {
+    std::ifstream wordFile(filePath);
+    std::string line;
+    std::vector<occurrence> occurrences;
+    while (std::getline(wordFile, line))
+    {
+        std::string word;
+        int docID, frequency, links;
+        bool title, category, references;
+        int idx = 0;
+        int len = line.length();
+        word = getstring(line, SEPARATOR, idx, len);
+        docID = getint(line, SEPARATOR, idx, len);
+        frequency = getint(line, SEPARATOR, idx, len);
+        title = getbool(line, SEPARATOR, idx, len);
+        category = getbool(line, SEPARATOR, idx, len);
+        references = getbool(line, SEPARATOR, idx, len);
+        links = getint(line, SEPARATOR, idx, len);
+        occurrences.push_back(occurrence(word, docID, frequency, title, category, references, links));
+        if (occurrences.size() >= MAX_INSERT_LIMIT)
+        {
+            insertOccurences(occurrences);
+            occurrences.clear();
+        }
+    }
+    insertOccurences(occurrences);
 }
 
 #endif

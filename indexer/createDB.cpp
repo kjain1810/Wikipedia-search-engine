@@ -3,10 +3,11 @@
 #include <string>
 #include <filesystem>
 #include <vector>
-#include "./cpp_utils/fileprocess.hpp"
+#include <thread>
 #include "./cpp_utils/structures.hpp"
 #include "./cpp_utils/global.hpp"
 #include "./cpp_utils/dbops.hpp"
+#include "./cpp_utils/threadfuncs.hpp"
 
 int numDocs = 0;
 int docFileCnt = 0;
@@ -53,14 +54,22 @@ int main(int argc, char *argv[])
     }
     std::cout << "Found " << wordFileCnt << " word files\n";
 
-    // Testing processDocFile
-    // for (auto filePath : docFiles)
-    // {
-    //     processDocFile(filePath);
-    // }
-    for (auto filePath : wordFiles)
+    std::vector<std::thread> ths;
+    for (int a = 0; a < NUM_THREADS; a++)
     {
-        processWordFile(filePath);
+        std::thread here(&doc_func, a, docFiles);
+        ths.push_back(here);
     }
+    for (int a = 0; a < NUM_THREADS; a++)
+        ths[a].join();
+
+    ths.clear();
+    for (int a = 0; a < NUM_THREADS; a++)
+    {
+        std::thread here(&word_func, a, wordFiles);
+        ths.push_back(here);
+    }
+    for (int a = 0; a < NUM_THREADS; a++)
+        ths[a].join();
     return 0;
 }

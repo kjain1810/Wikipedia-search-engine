@@ -24,13 +24,24 @@ struct words
 
 struct occurrence
 {
-    int wordID;
+    std::string word;
     int docID;
     int frequency;
     int links;
     bool references;
     bool title;
     bool category;
+
+    occurrence(std::string w, int d, int f, bool r, bool t, bool c, int l)
+    {
+        word = w;
+        docID = d;
+        frequency = f;
+        references = r;
+        title = t;
+        category = c;
+        links = l;
+    }
 };
 
 #endif
