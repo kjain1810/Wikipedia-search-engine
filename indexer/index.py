@@ -9,3 +9,4 @@ if __name__ == "__main__":
         if file[0:4] == "Wiki":
             print("Found file " + file)
             indexer.parse_files(os.path.join(curpath, file))
+            print("Parsed " + file)

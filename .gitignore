@@ -4,3 +4,6 @@ indexer/Wikipedia-20201202230101.xml
 scraper/pages_2.txt
 indexer/__pycache__/*
 indexer/Wikipedia-20201206200853.xml
+indexer/Wikipedia-20201214092241.xml
+indexer/files/*
+indexer/run

@@ -37,9 +37,6 @@ class Indexer(xml.sax.handler.ContentHandler):
         self.parser.parse(filepath)
         print(f"{filepath} parsed!")
 
-    def endDocument(self):
-        self.invertedindexer.finishwrites()
-
     def startElement(self, name, attrs):
         self.current_tag = name
 
@@ -47,7 +44,7 @@ class Indexer(xml.sax.handler.ContentHandler):
         if name == 'page':
             self.index()
             self.doccount += 1
-            if self.doccount % 100 == 0:
+            if self.doccount % 1000 == 0:
                 print(self.doccount)
             self.current_doc_data = ""
             self.current_doc_name = ""
@@ -82,6 +79,8 @@ class Indexer(xml.sax.handler.ContentHandler):
             if token == '':
                 continue
             if REMOVE_STOPWORDS and token in self.stop_words:
+                continue
+            if token[0].isnumeric and len(token) > 4:
                 continue
             toinsert = token
             if STEMMING:
@@ -126,15 +125,15 @@ class Indexer(xml.sax.handler.ContentHandler):
                             links_dict[link] = 0
                         links_dict[link] += 1
 
-        self.invertedindexer.insertdocument(
+        doc_id = self.invertedindexer.insertdocument(
             self.current_doc_name.strip(), num_tokens)
         self.invertedindexer.index(
-            word_dict, category_dict, reference_dict, links_dict)
+            word_dict, category_dict, reference_dict, links_dict, doc_id)
 
 
 if __name__ == "__main__":
     indexer = Indexer()
     print("Parsing...")
     start_time = time.time()
-    indexer.parse_files("Wikipedia-20201206200853.xml")
-    print("Completed 2 docs in: %s seconds" % (time.time() - start_time))
+    indexer.parse_files("Wikipedia-20201214092241.xml")
+    print("Completed 10 docs in: %s seconds" % (time.time() - start_time))
