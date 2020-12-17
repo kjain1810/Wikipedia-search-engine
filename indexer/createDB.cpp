@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <vector>
 #include <pthread.h>
+#include <time.h>
 #include "./cpp_utils/structures.hpp"
 #include "./cpp_utils/global.hpp"
 #include "./cpp_utils/dbops.hpp"
@@ -16,6 +17,7 @@ int wordFileCnt = 0;
 
 int main(int argc, char *argv[])
 {
+    clock_t tStart = clock();
     // get number of document files
     if (argc == 1)
     {
@@ -74,5 +76,7 @@ int main(int argc, char *argv[])
     }
     for (int a = 0; a < NUM_THREADS; a++)
         pthread_join(ths[a], NULL);
+    std::cout << "Indexing over!";
+    std::cout << std::fixed << std::setprecision(10) << "Indexed all files in " << (double)(clock() - tStart) / CLOCKS_PER_SEC << " seconds\n";
     return 0;
 }
