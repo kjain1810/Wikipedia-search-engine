@@ -1,11 +1,11 @@
 #ifndef GLOBALS
 #define GLOBALS
-#include <shared_mutex>
-#include <mutex>
 
-int MAX_INSERT_LIMIT = 10;
+#include <vector>
+
+int MAX_INSERT_LIMIT = 1000;
 int CURRENT_WORD_ID = 0;
-int NUM_THREADS = 8;
+int NUM_THREADS = 4;
 
 char SEPARATOR = ',';
 
