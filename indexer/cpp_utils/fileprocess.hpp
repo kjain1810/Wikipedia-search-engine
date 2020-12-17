@@ -48,7 +48,7 @@ bool getbool(std::string line, char separator, int &idx, int len)
     return ret;
 }
 
-void processDocFile(std::string filePath)
+void processDocFile(std::string filePath, int threadID)
 {
     std::ifstream docFile(filePath);
     std::string line;
@@ -65,11 +65,11 @@ void processDocFile(std::string filePath)
         documents.push_back(docs(docID, title, tokens));
         if (documents.size() >= MAX_INSERT_LIMIT)
         {
-            insertDocuments(documents);
+            insertDocuments(documents, threadID);
             documents.clear();
         }
     }
-    insertDocuments(documents);
+    insertDocuments(documents, threadID);
 }
 
 void processWordFile(std::string filePath)

@@ -3,7 +3,7 @@
 #include <string>
 #include <filesystem>
 #include <vector>
-#include <thread>
+#include <pthread.h>
 #include "./cpp_utils/structures.hpp"
 #include "./cpp_utils/global.hpp"
 #include "./cpp_utils/dbops.hpp"
@@ -13,9 +13,6 @@ int numDocs = 0;
 int docFileCnt = 0;
 int numWords = 0;
 int wordFileCnt = 0;
-
-std::vector<std::string> docFiles;
-std::vector<std::string> wordFiles;
 
 int main(int argc, char *argv[])
 {
@@ -53,23 +50,29 @@ int main(int argc, char *argv[])
         }
     }
     std::cout << "Found " << wordFileCnt << " word files\n";
-
-    std::vector<std::thread> ths;
+    initializeSQLite();
+    std::vector<pthread_t> ths;
     for (int a = 0; a < NUM_THREADS; a++)
     {
-        std::thread here(&doc_func, a, docFiles);
-        ths.push_back(here);
+        pthread_t thread_here;
+        int *arg = new int;
+        *arg = a;
+        pthread_create(&thread_here, NULL, doc_func, (void *)arg);
+        ths.push_back(thread_here);
     }
     for (int a = 0; a < NUM_THREADS; a++)
-        ths[a].join();
-
+        pthread_join(ths[a], NULL);
+    std::cout << "Documents inserted!\n";
     ths.clear();
     for (int a = 0; a < NUM_THREADS; a++)
     {
-        std::thread here(&word_func, a, wordFiles);
-        ths.push_back(here);
+        pthread_t thread_here;
+        int *arg = new int;
+        *arg = a;
+        pthread_create(&thread_here, NULL, word_func, (void *)arg);
+        ths.push_back(thread_here);
     }
     for (int a = 0; a < NUM_THREADS; a++)
-        ths[a].join();
+        pthread_join(ths[a], NULL);
     return 0;
 }

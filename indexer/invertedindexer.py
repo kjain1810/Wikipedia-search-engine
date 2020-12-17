@@ -91,11 +91,11 @@ class InvertedIndexer():
                 tokens[token] = self.getworddoc(doc_id, references=True)
             else:
                 tokens[token]['references'] = True
-        for token in link_dict:
-            if token not in tokens:
-                tokens[token] = self.getworddoc(doc_id, links=link_dict[token])
-            else:
-                tokens[token]['links'] = link_dict[token]
+        # for token in link_dict:
+        #     if token not in tokens:
+        #         tokens[token] = self.getworddoc(doc_id, links=link_dict[token])
+        #     else:
+        #         tokens[token]['links'] = link_dict[token]
         # write tokens into a file
         self.writetowordfiles(tokens)
 

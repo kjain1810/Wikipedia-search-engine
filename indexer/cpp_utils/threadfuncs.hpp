@@ -1,23 +1,32 @@
 #ifndef THREADFUNCS
 #define THREADFUNCS
 
-#include <map>
 #include <vector>
+#include <pthread.h>
+#include <iostream>
 #include "global.hpp"
 #include "fileprocess.hpp"
 
-std::map<std::string, int> word2id;
-
-void doc_func(int offset, std::vector<std::string> &vec)
+void *doc_func(void *args)
 {
-    for (int a = offset; a < vec.size(); a += NUM_THREADS)
-        processDocFile(vec[a]);
+    int offset = *((int *)args);
+    for (int a = offset; a < docFiles.size(); a += NUM_THREADS)
+    {
+        processDocFile(docFiles[a], offset);
+        std::cout << "Finished document file " << a + 1 << "\n";
+    }
+    pthread_exit(NULL);
 }
 
-void word_func(int offset, std::vector<std::string> &vec)
+void *word_func(void *args)
 {
-    for (int a = offset; a < vec.size(); a += NUM_THREADS)
-        processWordFile(vec[a]);
+    int offset = *((int *)args);
+    for (int a = offset; a < wordFiles.size(); a += NUM_THREADS)
+    {
+        processWordFile(wordFiles[a]);
+        std::cout << "Finished word file " << a + 1 << "\n";
+    }
+    pthread_exit(NULL);
 }
 
 #endif
