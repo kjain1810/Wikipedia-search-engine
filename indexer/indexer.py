@@ -11,7 +11,12 @@ from invertedindexer import InvertedIndexer
 class Indexer(xml.sax.handler.ContentHandler):
     def __init__(self):
 
-        self.stop_words = stopwords.words("english")
+        # self.stop_words = stopwords.words("english")
+        self.stop_words = []
+        stopwordFile = open("./stopwords.txt", "r")
+        for line in stopwordFile.readline():
+            self.stop_words.append(line)
+        stopwordFile.close()
         self.stemmer = Stemmer.Stemmer('english')
         self.invertedindexer = InvertedIndexer()
 
@@ -45,7 +50,7 @@ class Indexer(xml.sax.handler.ContentHandler):
             self.index()
             self.doccount += 1
             if self.doccount % 1000 == 0:
-                print(self.doccount)
+                print(f"{self.doccount} pages parsed")
             self.current_doc_data = ""
             self.current_doc_name = ""
 
@@ -91,7 +96,7 @@ class Indexer(xml.sax.handler.ContentHandler):
         num_tokens = 0
 
         for token in page_content:
-            if token[0].isnumeric() and len(token) > 4:
+            if token[0] in '0123456789' and len(token) != 4:
                 continue
             if self.ignore_reg.match(token):
                 continue

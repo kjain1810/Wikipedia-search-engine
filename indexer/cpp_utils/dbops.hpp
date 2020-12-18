@@ -69,46 +69,51 @@ void insertOccurences(std::vector<occurrence> &occurences)
     for (auto occ : occurences)
     {
         // fetch or insert word
+        int here;
         dictMutex.lock_shared();
         if (word2id.find(occ.word) == word2id.end())
         {
             dictMutex.unlock_shared();
             dictMutex.lock();
+            here = CURRENT_WORD_ID;
             word2id[occ.word] = CURRENT_WORD_ID++;
             dictMutex.unlock();
-            dictMutex.lock_shared();
             sqlite3_bind_int(stmtWords, 1, word2id[occ.word]);
             sqlite3_bind_text(stmtWords, 2, occ.word.c_str(), occ.word.length(), SQLITE_STATIC);
             if (sqlite3_step(stmtWords) != SQLITE_DONE)
                 std::cout << "Database error on word " << occ.word << "!\n";
             sqlite3_reset(stmtWords);
         }
+        else
+        {
+            here = word2id[occ.word];
+            dictMutex.unlock_shared();
+        }
         if (occ.frequency > 0)
         {
             sqlite3_bind_int(stmtFreq, 1, occ.docID);
-            sqlite3_bind_int(stmtFreq, 2, word2id[occ.word]);
+            sqlite3_bind_int(stmtFreq, 2, here);
             sqlite3_bind_int(stmtFreq, 3, occ.frequency);
         }
         if (occ.references)
         {
             sqlite3_bind_int(stmtRefs, 1, occ.docID);
-            sqlite3_bind_int(stmtRefs, 2, word2id[occ.word]);
+            sqlite3_bind_int(stmtRefs, 2, here);
             sqlite3_bind_int(stmtRefs, 3, 1);
         }
         if (occ.title)
         {
             sqlite3_bind_int(stmtTitle, 1, occ.docID);
-            sqlite3_bind_int(stmtTitle, 2, word2id[occ.word]);
+            sqlite3_bind_int(stmtTitle, 2, here);
             sqlite3_bind_int(stmtTitle, 3, 1);
         }
         if (occ.category)
         {
             sqlite3_bind_int(stmtCategory, 1, occ.docID);
-            sqlite3_bind_int(stmtCategory, 2, word2id[occ.word]);
+            sqlite3_bind_int(stmtCategory, 2, here);
             sqlite3_bind_int(stmtCategory, 3, 1);
         }
 
-        dictMutex.unlock_shared();
         if (occ.frequency > 0 && sqlite3_step(stmtFreq) != SQLITE_DONE)
             std::cout << "Database error on doc " << occ.docID << " and word " << occ.word << " with freq!\n";
         else if (occ.frequency > 0)

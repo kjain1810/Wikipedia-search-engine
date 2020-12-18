@@ -17,7 +17,9 @@ int wordFileCnt = 0;
 
 int main(int argc, char *argv[])
 {
-    clock_t tStart = clock();
+    struct timespec start, finish;
+    double elapsed;
+    clock_gettime(CLOCK_MONOTONIC, &start);
     // get number of document files
     if (argc == 1)
     {
@@ -52,6 +54,7 @@ int main(int argc, char *argv[])
         }
     }
     std::cout << "Found " << wordFileCnt << " word files\n";
+    clock_t tStart = clock();
     initializeSQLite();
     std::vector<pthread_t> ths;
     for (int a = 0; a < NUM_THREADS; a++)
@@ -77,6 +80,9 @@ int main(int argc, char *argv[])
     for (int a = 0; a < NUM_THREADS; a++)
         pthread_join(ths[a], NULL);
     std::cout << "Indexing over!";
-    std::cout << std::fixed << std::setprecision(10) << "Indexed all files in " << (double)(clock() - tStart) / CLOCKS_PER_SEC << " seconds\n";
+    clock_gettime(CLOCK_MONOTONIC, &finish);
+    elapsed = (finish.tv_sec - start.tv_sec);
+    elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
+    std::cout << std::fixed << std::setprecision(10) << "Indexed all files in " << elapsed << " seconds\n";
     return 0;
 }
