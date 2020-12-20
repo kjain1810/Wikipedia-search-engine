@@ -2,6 +2,7 @@
 #define GLOBALS
 
 #include <vector>
+#include <string>
 
 int MAX_INSERT_LIMIT = 10000;
 int CURRENT_WORD_ID = 0;

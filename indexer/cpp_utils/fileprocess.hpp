@@ -58,10 +58,21 @@ void processDocFile(std::string filePath, int threadID)
         int docID = 0, tokens = 0;
         std::string title = "";
         int len = line.length();
-        int idx = 0;
-        docID = getint(line, SEPARATOR, idx, len);
-        title = getstring(line, SEPARATOR, idx, len);
-        tokens = getint(line, SEPARATOR, idx, len);
+        int st = 0, en = len - 1;
+        while (line[st] <= '9' && line[st] >= '0')
+        {
+            docID *= 10;
+            docID += (int)(line[st] - '0');
+            st++;
+        }
+        int mul = 1;
+        while (line[en] <= '9' && line[en] >= '0')
+        {
+            tokens += (mul * (int)(line[en] - '0'));
+            en--;
+        }
+        for (int a = st + 1; a < en; a++)
+            title += line[a];
         documents.push_back(docs(docID, title, tokens));
         if (documents.size() >= MAX_INSERT_LIMIT)
         {

@@ -52,6 +52,10 @@ class InvertedIndexer():
     def insertdocument(self, doc_title, num_tokens):
         # curdoc = {'doc_id': self.doc_count,
         #           'title': doc_title, 'tokens': num_tokens}
+        if num_tokens > 1000000000:
+            print("too many tokens")
+        if num_tokens < 0:
+            print("random error")
         curdoc = str(self.doc_count) + "," + doc_title + "," + str(num_tokens)
         # write curdon into file
         self.writetodocfiles(curdoc)

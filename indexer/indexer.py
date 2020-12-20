@@ -12,10 +12,11 @@ class Indexer(xml.sax.handler.ContentHandler):
     def __init__(self):
 
         # self.stop_words = stopwords.words("english")
-        self.stop_words = []
+        self.stop_words = ['wiki', 'x', 'text',
+                           'ref', 'date', 'www', 'org', 's', 'web']
         stopwordFile = open("./stopwords.txt", "r")
-        for line in stopwordFile.readline():
-            self.stop_words.append(line)
+        for line in stopwordFile.readlines():
+            self.stop_words.append(line[:-1])
         stopwordFile.close()
         self.stemmer = Stemmer.Stemmer('english')
         self.invertedindexer = InvertedIndexer()
@@ -76,20 +77,22 @@ class Indexer(xml.sax.handler.ContentHandler):
 
     def index(self):
         # all text
-        tokenized_text = self.tok_reg.split(
-            self.current_doc_data + (" " + self.current_doc_name.strip()) * TITLE_WEIGHT)
+        text_here = self.current_doc_data
+        for i in range(TITLE_WEIGHT):
+            text_here += " " + self.current_doc_name.strip()
+        tokenized_text = self.tok_reg.split(text_here)
         page_content = []
 
         for token in tokenized_text:
             if token == '':
                 continue
+            toinsert = token
             if REMOVE_STOPWORDS and token in self.stop_words:
                 continue
-            if token[0].isnumeric and len(token) > 4:
-                continue
-            toinsert = token
             if STEMMING:
                 toinsert = self.stemmer.stemWord(toinsert)
+            if token[0].isnumeric and len(token) > 4:
+                continue
             page_content.append(toinsert)
 
         word_dict = {}
