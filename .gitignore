@@ -8,3 +8,4 @@ indexer/Wikipedia-20201214092241.xml
 indexer/files/*
 indexer/run
 db/wikipediaDB.db
+searcher/run
